@@ -30,11 +30,16 @@ const getJWTControllers = async (req, res) => {
 
 const validateJWTControllers = (req, res) => {
   try {
-    const { jwt } = req.body;
-    validateJWTServices(jwt);
-    res.status(200).send('Token is valid');
+    const authHeader = req.headers.authorization;
+    const token = authHeader;
+    if (token == null) return res.sendStatus(401);
+    const verified = validateJWTServices(token);
+    if (verified) {
+      return res.status(200).send('Token is valid');
+    }
+    return res.status(400).send('Token is not valid');
   } catch (err) {
-    res.status(400).json({
+    return res.status(400).json({
       status: 'fail',
       message: err,
     });
